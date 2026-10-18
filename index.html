@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng 20/10 - Lớp 10D2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0b0210;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Canvas hiệu ứng đom đóm nền & pháo hoa */
+        canvas#bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Nút bật/tắt nhạc góc màn hình */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- BƯỚC 1: MÀN HÌNH CHÍNH --- */
+        #step1 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .header-tag {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #ff99c8;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .flower-icon {
+            font-size: 80px;
+            filter: drop-shadow(0 0 20px #ff4d8d);
+            animation: pulse 2s infinite alternate;
+            margin-bottom: 15px;
+        }
+
+        .sub-title {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            color: #ffc2d1;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .main-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: #ffe5ec;
+            margin-bottom: 35px;
+            text-shadow: 0 0 10px rgba(255, 182, 193, 0.5);
+            line-height: 1.4;
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #ff4d8d, #8f00ff);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 77, 141, 0.6);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 77, 141, 0.9);
+        }
+
+        /* --- BƯỚC 2: TRANG PHONG THƯ MỞ RA --- */
+        #step2 {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #ff4d8d;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 15px 35px rgba(255, 77, 141, 0.4);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.5s ease;
+        }
+
+        .envelope-container:hover {
+            transform: scale(1.03);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #d63384;
+            transform-origin: top;
+            transition: transform 0.8s ease-in-out;
+            z-index: 3;
+        }
+
+        .envelope-container.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .envelope-heart {
+            font-size: 40px;
+            z-index: 4;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .envelope-text {
+            margin-top: 25px;
+            font-size: 1rem;
+            color: #ffc2d1;
+            letter-spacing: 1px;
+        }
+
+        /* --- BƯỚC 3: TRANG NỘI DUNG LỜI CHÚC --- */
+        #step3 {
+            display: none;
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        .letter-card {
+            background: rgba(255, 240, 245, 0.95);
+            color: #4a1525;
+            border-radius: 20px;
+            padding: 35px 25px;
+            box-shadow: 0 10px 40px rgba(255, 77, 141, 0.4);
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid #ffb6c1;
+        }
+
+        .letter-card h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.3rem;
+            color: #d63384;
+            margin-bottom: 20px;
+        }
+
+        .letter-content {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            text-align: justify;
+            margin-bottom: 25px;
+        }
+
+        .letter-content p {
+            margin-bottom: 15px;
+        }
+
+        .letter-footer {
+            font-weight: 700;
+            color: #d63384;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* --- BƯỚC 4: MÀN HÌNH PHÁO HOA & TRÁI TIM HỘI TỤ --- */
+        #step4 {
+            display: none;
+            animation: zoomIn 1s ease-in-out forwards;
+        }
+
+        .final-title {
+            font-size: 0.95rem;
+            letter-spacing: 3px;
+            color: #ff99c8;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .final-big-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #fe9a8b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .final-year {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff4d8d;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 77, 141, 0.8);
+        }
+
+        .final-quote {
+            font-style: italic;
+            color: #ffe5ec;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nhạc nền YouTube (Đi Giữa Trời Rực Rỡ Remix) -->
+    <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/8hWs2_3pvtk?autoplay=1&loop=1&playlist=8hWs2_3pvtk" frameborder="0" allow="autoplay"></iframe>
+
+    <button class="music-control" onclick="toggleMusic()">🔊 Tắt/Bật Nhạc</button>
+
+    <!-- Canvas vẽ hiệu ứng đom đóm & pháo hoa hội tụ trái tim -->
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="container">
+        
+        <!-- BƯỚC 1: MÀN HÌNH CHÍNH -->
+        <div id="step1">
+            <div class="header-tag">ĐÓA HOA YÊU THƯƠNG • 20/10</div>
+            <div class="flower-icon">🌷</div>
+            <div class="sub-title">20.10 — GỬI TẶNG CÁC BẠN NỮ 10D2</div>
+            <h1 class="main-title">Ngày hôm nay, có một hộp thư và món quà đặc biệt dành riêng cho em...</h1>
+            <button class="btn-main" onclick="goToStep(2)">
+                <span>🎁 MỞ HỘP THƯ & MÓN QUÀ</span>
+            </button>
+        </div>
+
+        <!-- BƯỚC 2: TRANG PHONG THƯ (Hiệu ứng mở thư) -->
+        <div id="step2">
+            <div class="envelope-container" id="envBox" onclick="openEnvelope()">
+                <div class="envelope-flap" id="envFlap"></div>
+                <div class="envelope-heart">💌</div>
+            </div>
+            <div class="envelope-text">Chạm để mở lá thư điều kỳ diệu...</div>
+        </div>
+
+        <!-- BƯỚC 3: TRANG NỘI DUNG LỜI CHÚC -->
+        <div id="step3">
+            <div class="letter-card">
+                <h2>Gửi Các Bạn Nữ Lớp 10D2 💐</h2>
+                <div class="letter-content">
+                    <p>Nhân ngày 20/10, đại diện cho các nam sinh lớp 10D2, chúc các bạn nữ luôn xinh đẹp, tràn đầy năng lượng và gặt hái được thật nhiều thành công trong học tập.</p>
+                    <p>Cảm ơn các bạn vì đã luôn là những mảnh ghép tuyệt vời, tạo nên sự dễ thương và ấm áp cho lớp chúng ta! ✨</p>
+                </div>
+                <div class="letter-footer">Thân tặng từ các nam sinh 10D2 ❤️</div>
+                <br>
+                <button class="btn-main" onclick="goToStep(4)">
+                    <span>✨ NHẬN ĐIỀU BẤT NGỜ CUỐI CÙNG</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- BƯỚC 4: MÀN HÌNH PHÁO HOA & TRÁI TIM HỘI TỤ -->
+        <div id="step4">
+            <div class="final-title">CHÚC MỪNG NGÀY PHỤ NỮ VIỆT NAM</div>
+            <h1 class="final-big-text">CÁC BẠN NỮ 10D2 LÀ ĐIỀU TUYỆT VỜI NHẤT</h1>
+            <div class="final-year">20 . 10</div>
+            <div class="final-quote">
+                "Chúc các bạn luôn rạng rỡ, xinh đẹp và có một ngày 20/10 thật đong đầy kỷ niệm đẹp!"
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="goToStep(1)">🔄 TRẢI NGHIỆM LẠI</button>
+                <button class="btn-secondary" onclick="goToStep(3)">📜 ĐỌC LẠI LỜI CHÚC</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Điều khiển Bật/Tắt nhạc nền
+        let isMusicPlaying = true;
+        function toggleMusic() {
+            const iframe = document.getElementById('bgMusic');
+            isMusicPlaying = !isMusicPlaying;
+            if (isMusicPlaying) {
+                iframe.src = "https://www.youtube.com/embed/8hWs2_3pvtk?autoplay=1&loop=1&playlist=8hWs2_3pvtk";
+            } else {
+                iframe.src = "";
+            }
+        }
+
+        // Hiệu ứng mở phong thư chuyển sang trang tiếp theo
+        function openEnvelope() {
+            const envBox = document.getElementById('envBox');
+            envBox.classList.add('open');
+            setTimeout(() => {
+                goToStep(3);
+                envBox.classList.remove('open'); // Reset lại trạng thái phong thư cho lần sau
+            }, 800); // Đợi hiệu ứng lật nắp phong thư hoàn thành rồi chuyển trang
+        }
+
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- HIỆU ỨNG NỀN ĐOM ĐÓM ---
+        const bgParticles = [];
+        for (let i = 0; i < 60; i++) {
+            bgParticles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 3 + 1,
+                speedY: -(Math.random() * 0.8 + 0.3),
+                speedX: Math.random() * 0.6 - 0.3,
+                color: `rgba(255, ${Math.floor(Math.random() * 100 + 120)}, 180, ${Math.random() * 0.6 + 0.3})`
+            });
+        }
+
+        // --- HIỆU ỨNG PHÁO HOA TRÁI TIM HỘI TỤ ---
+        let heartParticles = [];
+        let isStep4 = false;
+
+        function getHeartPosition(t, scale) {
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+            return { x: x * scale, y: y * scale };
+        }
+
+        function initHeartParticles() {
+            heartParticles = [];
+            const count = 350;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2.3;
+            const scale = Math.min(canvas.width, canvas.height) / 45;
+
+            for (let i = 0; i < count; i++) {
+                const t = (i / count) * Math.PI * 2;
+                const targetPos = getHeartPosition(t, scale);
+                const angle = Math.random() * Math.PI * 2;
+
+                heartParticles.push({
+                    x: centerX + Math.cos(angle) * (Math.random() * 20),
+                    y: centerY + Math.sin(angle) * (Math.random() * 20),
+                    targetX: centerX + targetPos.x,
+                    targetY: centerY + targetPos.y,
+                    vx: Math.cos(angle) * (Math.random() * 8 + 2),
+                    vy: Math.sin(angle) * (Math.random() * 8 + 2),
+                    size: Math.random() * 3.5 + 1.5,
+                    color: `hsl(${Math.random() * 40 + 330}, 100%, 70%)`,
+                    progress: 0,
+                    converged: false
+                });
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Vẽ nền đom đóm
+            bgParticles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                if (p.y < 0) {
+                    p.y = canvas.height;
+                    p.x = Math.random() * canvas.width;
+                }
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Vẽ pháo hoa trái tim ở bước cuối
+            if (isStep4) {
+                heartParticles.forEach(p => {
+                    if (!p.converged) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vx *= 0.95;
+                        p.vy *= 0.95;
+                        p.progress += 0.015;
+                        if (p.progress >= 0.4) {
+                            p.x += (p.targetX - p.x) * 0.08;
+                            p.y += (p.targetY - p.y) * 0.08;
+                            if (Math.abs(p.x - p.targetX) < 1 && Math.abs(p.y - p.targetY) < 1) {
+                                p.converged = true;
+                            }
+                        }
+                    } else {
+                        p.x = p.targetX + (Math.random() - 0.5) * 0.6;
+                        p.y = p.targetY + (Math.random() - 0.5) * 0.6;
+                    }
+
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = p.color;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                });
+            }
+
+            requestAnimationFrame(render);
+        }
+        render();
+
+        function goToStep(stepNumber) {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('step4').style.display = 'none';
+
+            isStep4 = false;
+
+            if (stepNumber === 1) {
+                document.getElementById('step1').style.display = 'flex';
+            } else if (stepNumber === 2) {
+                document.getElementById('step2').style.display = 'flex';
+            } else if (stepNumber === 3) {
+                document.getElementById('step3').style.display = 'block';
+            } else if (stepNumber === 4) {
+                document.getElementById('step4').style.display = 'block';
+                isStep4 = true;
+                initHeartParticles();
+            }
+        }
+    </script>
+</body>
+</html>
